@@ -3,7 +3,6 @@ import socket
 import threading
 import game
 
-
 NONE = '.'
 RED = 'R'
 YELLOW = 'Y'
@@ -24,76 +23,27 @@ def handle_client1(conn, addr):
     elif int(mode_to_run) == 2:  # if 2 we play vs computer
         difficulty = conn.recv(1024).decode(FORMAT)  # get difficulty
         games_to_win = conn.recv(1024).decode(FORMAT)  # gets num of game to win
-
-        won_by_red = 0  # variables
-        won_by_yellow = 0
-        rounds = 0
-        rounds_per_match = []
         for index in range(int(games_to_win)):  # runs on all games.
             g = game.Game()
-            turn = RED
             while True:
-                rounds += 1
                 g.printBoard()
-
                 client_column = conn.recv(1024).decode(FORMAT)  # received column from user
                 print(f"Received from client column wanted #{client_column}")
                 w_c = g.insert(int(client_column), RED)
-                if w_c:  # if we received a winner from the game
-                    if w_c == YELLOW:  # if yellow we update
-                        won_by_yellow += 1
-                    else:  # else its red
-                        won_by_red += 1
-
-                    print(
-                        f"the game was finished in {rounds} rounds, the winner of game # {str(index + 1)} was {w_c}")  # update about who won the game and in how many rounds
-                    print(
-                        f"the current score is {won_by_red} - {won_by_yellow}")  # updates the current score of the game so far.
-                    rounds_per_match.append(rounds)
-                    rounds = 0  # sets the rounds counter back to 0
-                    winner_message = "yellow" if w_c == YELLOW else "red"  # sets who won to send back to user.
-
-                    conn.send(winner_message.encode(FORMAT))  # sends the message back to the user.
-                    break  # if the game had a winner we break the while loop and go on to the next match.
+                if w_c:
+                    break
+                print("computers turn:")
+                if int(difficulty) == 1:
+                    computer_column = random.randint(0, 6)
                 else:
-                    g.printBoard()
-                    print("computers turn:")
-                    if int(difficulty) == 1 or rounds == 1:
-                        computer_column = random.randint(0, 6)
-                    else:
-                        computer_column = get_smart_column(g)
+                    computer_column = get_smart_column(g)
 
-                    w = g.insert(int(computer_column), YELLOW)
+                conn.send(str(computer_column).encode(FORMAT))
 
-                    if w:  # if we received a winner from the game
-                        if w == YELLOW:  # if yellow we update
-                            won_by_yellow += 1
-                        else:  # else its red
-                            won_by_red += 1
+                w = g.insert(int(computer_column), YELLOW)
+                if w:
+                    break
 
-                        print(
-                            f"the game was finished in {rounds} rounds, the winner of game # {str(index + 1)} was {w}")  # update about who won the game and in how many rounds
-                        print(
-                            f"the current score is {won_by_red} - {won_by_yellow}")  # updates the current score of the game so far.
-                        rounds_per_match.append(rounds)
-                        rounds = 0  # sets the rounds counter back to 0
-                        winner_message = "yellow" if w == YELLOW else "red"  # sets who won to send back to user.
-
-                        conn.send(winner_message.encode(FORMAT))  # sends the message back to the user.
-                        break  # if the game had a winner we break the while loop and go on to the next match.
-                    else:
-                        conn.send(str(computer_column).encode(FORMAT))  # if no winner was elected we just send the column that was selected by computer.
-        if won_by_red > won_by_yellow:
-            print("you won total match!")
-        elif won_by_yellow == won_by_red:
-            print("match was concluded at a tie !")
-        else:
-            print("computer won total match!")
-        rounds_average = sum(rounds_per_match) / len(rounds_per_match)
-        print(f"this game rounds average was {rounds_average}")
-        print(f" that game covered {round(g.get_percentage_board(),2) } of the board ")
-        results = g.get_highest()
-        print(f" in that game the highest column was {results[1]} and it was of height {(-1) * int(results[0])}")
 
 
 def get_smart_column(game):  # receives the input column of the computer by looking for another yellow
@@ -129,6 +79,7 @@ def start_server():
             print("too many Clients are logged in try again later.")
             connection.send("hello".encode(FORMAT))
             connection.close()
+
 
 # Main
 if __name__ == '__main__':

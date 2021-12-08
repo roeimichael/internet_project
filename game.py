@@ -1,16 +1,16 @@
 from itertools import groupby, chain
 
-NONE = '.'
+NONE = '-'
 RED = 'R'
 YELLOW = 'Y'
 
 
-def diagonalsPos(matrix, cols, rows):
+def diagonalsPos(matrix, cols, rows):  # gets matrix positive diagonals
     for di in ([(j, i - j) for j in range(cols)] for i in range(cols + rows - 1)):
         yield [matrix[i][j] for i, j in di if 0 <= i < cols and 0 <= j < rows]
 
 
-def diagonalsNeg(matrix, cols, rows):
+def diagonalsNeg(matrix, cols, rows):  # gets matrix negative diagonals
     for di in ([(j, i - cols + j + 1) for j in range(cols)] for i in range(cols + rows - 1)):
         yield [matrix[i][j] for i, j in di if 0 <= i < cols and 0 <= j < rows]
 
@@ -33,15 +33,8 @@ class Game:
         while c[i] != NONE:
             i -= 1
         c[i] = color
-        winner = self.checkForWin()
+        winner = self.getWinner()
         return winner
-
-    def checkForWin(self):
-        w = self.getWinner()
-        if w:
-            self.printBoard()
-            print(f"{w} Won!")
-            return w
 
     def getWinner(self):
         lines = (
@@ -51,15 +44,15 @@ class Game:
             diagonalsNeg(self.board, self.cols, self.rows)  # negative diagonals
         )
 
-        for line in chain(*lines):
-            for color, group in groupby(line):
-                if color != NONE and len(list(group)) >= 4:
+        for line in chain(*lines):  # for each line in (chain(*lines)- makes a big list out of all the lines)
+            for color, group in groupby(line):  # creates a group by each line that is deviated by color for each of the lines
+                if color != NONE and len(list(group)) >= 4:  # checks if the conditions for a win are applying
                     return color
 
     def printBoard(self):
-        print('  '.join(map(str, range(self.cols))))
+        print(' | '.join(map(str, range(self.cols))))
         for y in range(self.rows):
-            print('  '.join(str(self.board[x][y]) for x in range(self.cols)))
+            print(' | '.join(str(self.board[x][y]) for x in range(self.cols)))
         print()
 
     def get_column(self):
@@ -90,6 +83,7 @@ class Game:
                 num_col = col
         return max_col, num_col
 
+
 if __name__ == '__main__':
     g = Game()
     turn = RED
@@ -100,9 +94,3 @@ if __name__ == '__main__':
             w = g.insert(int(column), turn)
             if not w:
                 turn = YELLOW if turn == RED else RED
-
-
-
-
-
-
