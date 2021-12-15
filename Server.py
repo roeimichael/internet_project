@@ -3,7 +3,7 @@ import socket
 import threading
 import game
 
-NONE = '.'
+NONE = '-'
 RED = 'R'
 YELLOW = 'Y'
 HOST = '127.0.0.1'  # Standard loopback IP address (localhost)
@@ -57,8 +57,11 @@ def get_smart_column(game):  # receives the input column of the computer by look
                 i -= 1
             if c[i + 1] == YELLOW:
                 return column
-    column = random.randint(0, 6)
-    return column
+    while True:
+        column = random.randint(0, 6)
+        c = game.board[column]
+        if c[0] == NONE:
+            return column
 
 
 def start_server():

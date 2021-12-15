@@ -2,7 +2,7 @@ import socket
 import time
 import game
 
-NONE = '.'
+NONE = '-'
 RED = 'R'
 YELLOW = 'Y'
 HOST = '127.0.0.1'  # The server's hostname or IP address
@@ -46,6 +46,7 @@ def start_client():
                 client_socket.send(wanted_column.encode(FORMAT))
                 w_c = g.insert(int(wanted_column), RED)
                 if w_c:  # if we received a winner from the game
+                    g.printBoard()
                     won_by_red += 1
                     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                     print(
@@ -69,6 +70,7 @@ def start_client():
                     computer_choice = client_socket.recv(1024).decode(FORMAT)  # Receiving winner/ column from computer
                     w = g.insert(int(computer_choice), YELLOW)
                     if w:  # if we received a winner from the game
+                        g.printBoard()
                         won_by_yellow += 1
                         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                         print(
