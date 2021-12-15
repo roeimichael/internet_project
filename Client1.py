@@ -106,8 +106,8 @@ def get_games():  # receives the amount of games wanted to be played
     while True:
         games_to_win = input("how many games are needed to win 1-5 (if you choose other u will be timed out)")
         if int(games_to_win) < 1 or int(games_to_win) > 5:
-            print(f"wrong input now you wait for {10 * multiplier} seconds ")
-            time.sleep(10 * multiplier)
+            print(f"wrong input now you wait for {60 * multiplier} seconds ")
+            time.sleep(60 * multiplier)
             multiplier *= 2
         else:
             return int(games_to_win)
